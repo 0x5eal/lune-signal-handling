@@ -1,3 +1,5 @@
+use std::rc::Weak;
+
 use mlua::prelude::*;
 
 use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect, Select};
@@ -14,6 +16,10 @@ use crate::lune::util::{
 mod prompt;
 use prompt::{PromptKind, PromptOptions, PromptResult};
 
+mod signal;
+
+use self::signal::signal_listen;
+
 pub fn create(lua: &Lua) -> LuaResult<LuaTable<'_>> {
     TableBuilder::new(lua)?
         .with_function("color", stdio_color)?
@@ -22,6 +28,18 @@ pub fn create(lua: &Lua) -> LuaResult<LuaTable<'_>> {
         .with_async_function("write", stdio_write)?
         .with_async_function("ewrite", stdio_ewrite)?
         .with_async_function("prompt", stdio_prompt)?
+        .with_async_function(
+            "handleSignal",
+            |lua, (sig_kind, handler): (_, LuaFunction)| async move {
+                let lua_inner = lua
+                    .app_data_ref::<Weak<Lua>>()
+                    .expect("Missing weak lua ref")
+                    .upgrade()
+                    .expect("Lua was dropped unexpectedly");
+
+                signal_listen(lua, (sig_kind, lua_inner.create_registry_value(handler)?)).await
+            },
+        )?
         .build_readonly()
 }
 
