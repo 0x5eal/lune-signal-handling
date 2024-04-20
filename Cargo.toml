@@ -26,6 +26,8 @@ cli = [
     "dep:include_dir",
     "dep:regex",
     "dep:rustyline",
+    "dep:async_zip",
+    "dep:tokio-util",
 ]
 roblox = [
     "dep:glam",
@@ -75,6 +77,7 @@ path-clean = "1.0"
 pathdiff = "0.2"
 pin-project = "1.0"
 urlencoding = "2.1"
+bstr = "1.9.1"
 
 ### RUNTIME
 
@@ -85,7 +88,7 @@ tokio = { version = "1.24", features = ["full", "tracing"] }
 os_str_bytes = { version = "7.0", features = ["conversions"] }
 
 mlua-luau-scheduler = { version = "0.0.2" }
-mlua = { version = "0.9.6", features = [
+mlua = { version = "0.9.7", features = [
     "luau",
     "luau-jit",
     "async",
@@ -149,3 +152,10 @@ rbx_dom_weak = { optional = true, version = "2.6.0" }
 rbx_reflection = { optional = true, version = "4.4.0" }
 rbx_reflection_database = { optional = true, version = "0.2.9" }
 rbx_xml = { optional = true, version = "0.13.2" }
+
+### CROSS COMPILATION
+async_zip = { optional = true, version = "0.0.16", features = [
+    "tokio",
+    "deflate",
+] }
+tokio-util = { optional = true, version = "0.7", features = ["io-util"] }
